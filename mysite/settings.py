@@ -25,20 +25,24 @@ SECRET_KEY = 'sc882#168ky&pyy@p%ny=z_1c5lw+i!p62*ej3!jq9c6p9yh)5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# This is not applied while debug mode is on,
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
+# This setting tells Django which applications are active for this site.
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    ###############################################################################
+    #By default, Django includes the following applications
+    'django.contrib.admin', #An administration site
+    'django.contrib.auth', #An authentication framework
+    'django.contrib.contenttypes', #A Framework for handling content types
+    'django.contrib.sessions', #A session framework
+    'django.contrib.messages', #A messaging framework
+    'django.contrib.staticfiles', #A framework for managing static files
+    ################################################################################
 ]
-
+# A list that contains middleware to be executed.
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
