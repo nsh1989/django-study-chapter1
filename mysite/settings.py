@@ -43,16 +43,160 @@ INSTALLED_APPS = [
     ################################################################################
 ]
 # A list that contains middleware to be executed.
+# -Middleware is a framework of hooks into Django's request/response processing.
+# -It's a light, low-level "plugin" system for globally altering Django's input or output.
+# -A Django installation doesn't require any middleware, but it's strongly suggested that you at least use CommonMiddleware.
+###############################################################################################################################################
+############################################ Middleware components that come with Django. ####################################################
+###############################################################################################################################################
+# - Cache middleware : for medium-to high-traffic websites, it's essential to cut as much overhaed as possible.
+#   To cache something is to save the resulf of an expensive calcuation so that you don't have to perform the calculation next time.
+#   Django comes with a robust cache system that lets you save dynamic pages so they don't have to be calculated for each request.
+#   Django offers different levels of cache granularity: You can cache the output of specific views, you can cache only the pieces
+#   that are difficult to produce, or you can cache your entire site.
+#   Django also works well with "downstream caches" -  refers to the chaching instructions associated with objects sent with responses to clients
+#   such as brwosers, mobile devices, or client proxies.
+#   -------------------------------------------------------------------------------------------------------------------------------------------
+#   1.Memcached : it's an entirely memory-based cache server, originally developed to handle high loads. It is used by sites such as Facebook and
+#   Wikipedia to reduce database access and dramatically increase site performance. All data is directly in memory, so there's no overhaed of
+#   database or filesystem usage
+#   One excellent feature of Memcached is its ability to share a cache over multiple servers. This means you can run Memcached daemons on multiple
+#   machines, and the program will treat the group of machines as a single cache, without the need to duplicate cache values on each machine.
+#   But it has a disadvantage: because the cached data is stored in momory, the data will be lost if your server crashes. So, don't rely on
+#   memory-based caching as your data storage, they're all intended to be solutions for caching.
+#   -------------------------------------------------------------------------------------------------------------------------------------------
+#   2.Database caching : Django can store its cached data in your database. This works best if you've got a fast, well-indexed database server.
+#   3.Filesystem caching : The file-based backend serializes and stores each cache value as a separate file.
+#   -------------------------------------------------------------------------------------------------------------------------------------------
+#   4.Local-memory caching : This is the default cache if another is not specified in your settings file. If you want the speed advantages of
+#   in-memory caching but don't have the capability of running Memcached, consider the local-memory cache backend. This cache is per-process
+#   and thread-safe. each process will have its own private cache instance, which means no cross-process caching is possible, This obviously
+#   also means the local memory cache isn't particularly memory-efficeint, so it's probably not a good choice for production environments.
+#   -------------------------------------------------------------------------------------------------------------------------------------------
+#   5.Custom cache backend : While Django includes support for a number of cache backends out-of -the-box.
+###############################################################################################################################################
+# -CommonMiddleware
+# Adds a few convenience
+# 1. Forbids access to user aents in the DISALLOWED_USER_AGENTS settings, which should be a list of compiled regular expression oobjects.
+# 2. Perfomrs URL rewriting based on the APPEND_SLASH and PREPEND_WWW settings. normalize URLs.
+# 3. Sets the content-Length header for non-streaming responses.
+# 4. CommonMiddleware.response_redirect_class
+#   -Defaults to HttpResponsePermanentRedirect. Subclass CommonMiddleware and override the attribute to customize the redirects issued
+#   by the middle ware.
+# 5. class BrokenLinkEmailsMiddleware
+#   -Sends broken link notification emails to MANGERS
+###############################################################################################################################################
+# -GZip middleware
+#   *warning* compression techiniques are used on a website, the site may become exposed to a number of possible attacks. *warning*
+# - It compresses content for browesers that understand GZip compression(all modern browsers).
+# - This middleware should be placed before any other middleware that need to read or write the response body so that compression happens
+# afterward.
+# - It will NOT compress content if any of the following are true:
+#   1. The content body is less than 200 bytes long.
+#   2. The response has already set the Content-Encoding header.
+#   3. The request (the browser) hasn't sent an Accept-Encoding header containing gzip.
+# - You can apply GZip compression to individual views using the gzip_page() decorator.
+###############################################################################################################################################
+# -Conditional GET middleware
+# Handles conditional Get operations. If the response doesn't have an ETag header, the middleware adds one if needed.
+# If the response has an ETag or Last-Modified header, and the request has IF-None-Match or IF-Modified-Since, the response is replaced by an
+# HttpResponseNotModified(The constructor doesn't take any arguments and no content should be added to this response. Use this to designate
+# that a page hasn't been modified since the user's last request(status code 304)).
+###############################################################################################################################################
+# -Locale middleware
+# Enables language selection based on data from the request. It customizes content for each user.
+###############################################################################################################################################
+# -Message middleware
+# Handles temporary messages.
+# Enables cookie- and session-based message support.
+###############################################################################################################################################
+# -Security middleware
+# *warning* If your deployment situation allows. it's usually a good idea to have your front-end Web server perform the functionality proveided
+# by the SecurityMiddleware. That way, if there are requests that aren't served by Django (such as static media or user-uploaded files), they
+# will have the same protections as requests to your Django application.
+# - It provides several security enhancements to the request/response cycle.
+#   1. SECURE_BROWSER_XSS_FILTER
+#   2. SECURE_CONTENT_TYPE_NOSNIFF
+#   3. SECURE_HSTS_INCLUDE_SUBDOMAINS
+#   4. SECURE_HSTS_PRELOAD
+#   5. SECURE_HSTS_SECONDS
+#   6. SECURE_REDIRECT_EXEMPT
+#   7. SECURE_REFERRER_POLICY
+#   8. SECURE_SSL_HOST
+#   9. SECURE_SSL_REDIRECT
+# - HTTP Strict Transport Security
+#   Websites only can be accessed over HTTPS. This reduces your exposure to some SSL-stripping man-in-the-middle(MITM) attacks.
+# -Referrer Policy (New in Django 3.0.)
+#   Browsers us the Referer header as a way to send information to a site about how users got there
+# -X-Content-Type-Options: nosniff
+# -X-XSS-Protection: 1; mode=block
+# -SSL Redirect
+###############################################################################################################################################
+# -Session middleware
+#   Enable session support.
+#   The session framework lets you store and retrieve arbitrary data on a per-site-visitor basis. It stores data on the server side and
+#   abstracts the sending and receiving of cookies. Cookies contain a session ID.
+###############################################################################################################################################
+# -Site middleware
+#   Adds the site attribute representing the current site to every incoming HttpRequest object.
+###############################################################################################################################################
+# -Authentication middleware
+#   Adds the user attribute, representing the currently-logged-in user, to every incoming HttpRequest object.
+###############################################################################################################################################
+# -CSRF protection middleware
+#   Adds protection against Cross Site Request Forgeries by adding hidden form fields to POST forms and checking requests for the correct value.
+###############################################################################################################################################
+# -X-Frame-Options middleware
+#   Simple clickjacking protection via the X-Frame-Options header.
+###############################################################################################################################################
+# Middleware ordering
+# 1.SecurityMiddleware
+#   It should go near the top of the list if you’re going to turn on the SSL redirect as that avoids running through a bunch of other unnecessary middleware.
+# 2.UpdateCacheMiddleware
+#   Before those that modify the Vary header (SessionMiddleware, GZipMiddleware, LocaleMiddleware).
+# 3.GZipMiddleware
+#   Before any middleware that may change or use the response body.
+#   After UpdateCacheMiddleware: Modifies Vary header.
+# 4.SessionMiddleware
+#   Before any middleware that may raise an an exception to trigger an error view (such as PermissionDenied) if you’re using CSRF_USE_SESSIONS.
+#   After UpdateCacheMiddleware: Modifies Vary header.
+# 5.ConditionalGetMiddleware
+#   Before any middleware that may change the response (it sets the ETag header).
+#   After GZipMiddleware so it won’t calculate an ETag header on gzipped contents.
+# 6.LocaleMiddleware
+#   One of the topmost, after SessionMiddleware (uses session data) and UpdateCacheMiddleware (modifies Vary header).
+# 7.CommonMiddleware
+#   Before any middleware that may change the response (it sets the Content-Length header). A middleware that appears before
+#   CommonMiddleware and changes the response must reset Content-Length.
+#   Close to the top: it redirects when APPEND_SLASH or PREPEND_WWW are set to True.
+#   After SessionMiddleware if you’re using CSRF_USE_SESSIONS.
+# 8.CsrfViewMiddleware
+#   Before any view middleware that assumes that CSRF attacks have been dealt with.
+#   Before RemoteUserMiddleware, or any other authentication middleware that may perform a login, and hence rotate the CSRF token,
+#   before calling down the middleware chain.
+#   After SessionMiddleware if you’re using CSRF_USE_SESSIONS.
+# 9.AuthenticationMiddleware
+#   After SessionMiddleware: uses session storage.
+# 10.MessageMiddleware
+#   After SessionMiddleware: can use session-based storage.
+# 11.FetchFromCacheMiddleware
+#   After any middleware that modifies the Vary header: that header is used to pick a value for the cache hash-key.
+# 12.FlatpageFallbackMiddleware
+#   Should be near the bottom as it’s a last-resort type of middleware.
+# 13.RedirectFallbackMiddleware
+#   Should be near the bottom as it’s a last-resort type of middleware.
+###############################################################################################################################################
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware', #associates users with requests using sessions.
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ROOT_RULCONF indicates the Python module where the root URL patterns of your application are defined.
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
@@ -77,7 +221,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
+# DATABASES is a dictionary that contains the settings for all the databases to be used in the project.
+# There must always be a default database. The default configuration uses an SQLite3 Database.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -107,7 +252,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-
+# LANGUAGE_CODE defines the default language code for this Django site.
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -115,7 +260,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_L10N = True
-
+# USE_TZ  tells a Django to activate/deactivate timezone support. Django comes with support for timezone-aware
+# datetime. This setting is set to True when you create a new project using the startproject managemnet commandsw
 USE_TZ = True
 
 
