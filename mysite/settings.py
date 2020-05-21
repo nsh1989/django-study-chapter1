@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     #By default, Django includes the following applications
     'django.contrib.admin', #An administration site
     'django.contrib.auth', #An authentication framework
+    #The Group and User models are part of the Django authentication framework located in django.contrib.auth
     'django.contrib.contenttypes', #A Framework for handling content types
     'django.contrib.sessions', #A session framework
     'django.contrib.messages', #A messaging framework

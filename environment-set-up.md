@@ -87,3 +87,29 @@ or if you add new models, you will have to create ne migration using the makemig
 The migration will allow Django to keep track of model changes. Then, you will have to apply it
 with the migrate command to keep the database in sync with your model 
 ```
+##Creating an administration site for your models
+1.Creating a superuser
+```bash
+python manage.py createsuperuser
+```
+2.The Django administration site
+```bash
+python manage.py runserver
+```
+Log in using the credentials of the user you created in the preceding step.\
+You will see the admin site index page, as shown in the following screenshot:
+![Administration-site-index-page](./EnvironmentSetupContents/Django-administration-001.png)
+the Group and User models you see in the preceding screenhost are part of the Django authentication \
+framework located in django.contrib.auth.\
+\
+3.Adding models to the administration site
+Edit the blog/admin.py file, add your models
+```python
+from django.contrib import admin
+from .models import Post
+
+admin.site.register(Post)
+```
+Reload the admin site in your browser. You should see the model on the admin site, as follows:
+![Administration-site-model-add](./EnvironmentSetupContents/Administration-site-model-add.png)
+
