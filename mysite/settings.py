@@ -42,7 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.messages', #A messaging framework
     'django.contrib.staticfiles', #A framework for managing static files
     ################################################################################
-    'blog.apps.BlogConfig'
+    'rest_framework', #Rest framework Adds
+    'corsheaders', #script태그 안에서의 api 통한 접근제어를 위해 HTTP 접근제어 규약(CORS:Cross-Origin Resource Sharing)
+    ##기존의 HTTP요청은 img나 link태그 등으로 다른 호스트이 css나 이미지파일 등의 리소접근 가능
+    ##script태그로 쌍혀진 코드에서의 다른 도메인에 대한 요청은 Same-origin policy에 대한 규약으로 인해 접근 불가
+    ##React는 거의가 script요청에 의해 페이지를 그리는 방식이므로 이에 대한 제약 해제가 필요.
+    ################################################################################
+    'blog.apps.BlogConfig',
 ]
 # A list that contains middleware to be executed.
 # -Middleware is a framework of hooks into Django's request/response processing.
@@ -189,6 +195,8 @@ INSTALLED_APPS = [
 #   Should be near the bottom as it’s a last-resort type of middleware.
 ###############################################################################################################################################
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+########################RestFrameWork + DJango + React######################################################################
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -196,6 +204,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware', #associates users with requests using sessions.
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
 ]
 
 # ROOT_RULCONF indicates the Python module where the root URL patterns of your application are defined.
@@ -250,9 +260,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-# Internationalization
+########################RestFrameWork + DJango + React######################################################################
+REST_FRAMEWORK={
+    'DEFAULT_PERMISSION_CLASSES':[
+        'rest_framework.permissions.AllowAny',
+    ]
+}
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000/' #script안에서의 리소스 요청을 허용할 도메인 추가
+)
+# Inernationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 # LANGUAGE_CODE defines the default language code for this Django site.
 LANGUAGE_CODE = 'en-us'
