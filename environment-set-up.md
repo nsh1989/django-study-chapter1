@@ -104,7 +104,7 @@ framework located in django.contrib.auth.\
 \
 3.Adding models to the administration site
 Edit the blog/admin.py file, add your models
-```python
+```text
 from django.contrib import admin
 from .models import Post
 
@@ -113,3 +113,39 @@ admin.site.register(Post)
 Reload the admin site in your browser. You should see the model on the admin site, as follows:
 ![Administration-site-model-add](./EnvironmentSetupContents/Administration-site-model-add.png)
 
+###Customizing the way models are displayed
+1.Edit the admin.py file of application and change it, as follows:
+```text
+from django.contrib import admin
+from .models import Post
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'author', 'publish', 'status')
+```
+We are telling the Django admin site that our model is registered in the admin site using a\
+custom class that inherits from ModelAmin. In this case, we can include information about\
+how to display the model in the admin site and how to interact with it.\
+The list_display attribute allows you to set the fields of your model that you want to display\
+in the admin object list page. The @admin.register() decorator peforms the same function \
+as the admin.site.register() function we have replaced.\
+**note**
+```text
+the Decorator is a design pattern that allows behavior to be added to an individuual object, 
+dynamically, without affecting the behavior of the objects from the same class. 
+```
+2.Customize the admin model with some more options, using the following code:
+```text
+from django.contrib import admin
+from .models import Post
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'author', 'publish', 'status')
+    list_filter = ('status', 'created', 'publish', 'author')
+    search_field = ('title', 'body')
+    prepopulated_fields = {'slug' : ('title',) }
+    raw_id_fields = ('author',)
+    date_hierarchy = 'publish'
+    ordering = ('status', 'publish')
+```
