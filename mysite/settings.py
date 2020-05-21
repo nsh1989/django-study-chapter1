@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages', #A messaging framework
     'django.contrib.staticfiles', #A framework for managing static files
     ################################################################################
+    'blog.apps.BlogConfig'
 ]
 # A list that contains middleware to be executed.
 # -Middleware is a framework of hooks into Django's request/response processing.
