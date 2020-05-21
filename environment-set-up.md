@@ -149,3 +149,45 @@ class PostAdmin(admin.ModelAdmin):
     date_hierarchy = 'publish'
     ordering = ('status', 'publish')
 ```
+##Working with QuerySet and managers
+Django comes with powerful database abstraction API **ORM(Object-relational mapper)**. ORM is  \
+compatible with MySQL, PostgreSQL, SQLite, and Oracle.
+##Building list and detail views
+Start by creating a view to display the list of posts.
+1.Edit the blog/view.py file. Chang it, as follows:
+```text
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def post_list(request):
+    posts = Post.published.all()
+    return render(request, 'blog/post/list.html', {'posts':posts})
+
+def post_detail(request, year, month, day, post):
+    post = get_object_or_404(Post, slug=post, status='published', 
+                             publish__year=year, 
+                             publish__month=month, 
+                             publish__day=day)
+    return render(request, 'blog/post/detail.html', {'post':post})
+```
+2.Adding URL patterns for your view
+
+Django runs through each URL pattern and stop at the first one matches the requested URL.
+
+Create an urls.py file in the directory of the application and add the following lines:
+```text
+from django.urls import path
+from . import views
+
+app_name = 'blog'
+
+urlpatterns = [
+    # post views
+    path('', views.post_list, name='post_list'),
+    path('<int:year>/<int:month>/<int:day>/<slug:post>/',
+         views.post_detail, name='post_detail')
+]
+```
+Include the URL patterns of the application in the main URL patterns of the project.\
+Edit the urls.py file located in the mysite directory of your project, make it, as follows:
+
