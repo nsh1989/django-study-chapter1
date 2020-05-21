@@ -4,6 +4,9 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+# Canonical URLs for models
+from django.urls import reverse
+
 class Post(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Drfat'),
@@ -48,3 +51,10 @@ class Post(models.Model):
         return self.title
     #The __strt__() method is the default human-readable representation of the object.
     #**NOTE**Python 2.x __unicode__() method is obsolete, in Python 3, all strings are natively consdiered Unicode.
+
+    def get_absolute_url(self):
+        return reverse('blog:post_detail',args=[self.publish.year,
+                                                self.publish.month,
+                                                self.publish.day,
+                                                self.slug])
+    ##reverse() method that aloows you to build URLs by their name and passing optional parameters.

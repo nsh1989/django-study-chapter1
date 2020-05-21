@@ -190,4 +190,50 @@ urlpatterns = [
 ```
 Include the URL patterns of the application in the main URL patterns of the project.\
 Edit the urls.py file located in the mysite directory of your project, make it, as follows:
+```text
+from django.urls import path
+from . import views
 
+app_name = 'blog'
+
+urlpatterns = [
+    # post views
+    path('', views.post_list, name='post_list'),
+    path('<int:year>/<int:month>/<int:day>/<slug:post>/',
+         views.post_detail, name='post_detail')
+]
+```
+Add follows in the blog/model.py file:
+```text
+from django.urls import reverse
+
+class Post(models.Model):
+    # ....
+    def get_absolute_url(self):
+        return reverse('blog:post_detail',args=[self.publish.year,
+                                                self.publish.month,
+                                                self.publish.day,
+                                                self.slug])
+    ##reverse() method that allows you to build URLs by their name and passing optional parameters.
+```
+Use get_absolute_url() method in our templates to link to specific posts.
+
+Creating templates for your views.
+Create the following directories and files inside your application directory:
+```text
+    template/
+        blog/
+            base.html 
+        post/
+            list.html
+            detail.html
+```
+base.html file will include the main HTML structure of the website and divide the content in the main content area \
+and a sidebar. The list.html and detail.html files will inherit from the base.html file to render the blog post list\
+and detail views, respectively.
+
+Django has a powerful template language that allows you to specify how data is displayed. It is based on template\
+tags, template variables, and template filters:
+- Template tags control the rendering of the template and look like {% tag %}.
+- Template variables get replace with values when the template is rendered and look like {{ variable }}.
+- Template filters allow you to modify variables for display and look like {{ variable|filter }}.
