@@ -267,7 +267,9 @@ REST_FRAMEWORK={
     ]
 }
 CORS_ORIGIN_WHITELIST = (
-    'localhost:3000/' #script안에서의 리소스 요청을 허용할 도메인 추가
+    'https://localhost:3000/', #script안에서의 리소스 요청을 허용할 도메인 추가
+    'https://localhost:8000/',
+    'https://localhost:8080/',
 )
 # Inernationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
